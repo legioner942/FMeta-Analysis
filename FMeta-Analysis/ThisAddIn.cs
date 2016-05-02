@@ -14,7 +14,7 @@ namespace FMeta_Analysis
         
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
-            //this.Application.ActiveWorkbook.ActiveSheet.Cells[1, 1] = 12;
+
         }
 
         private void ThisAddIn_Shutdown(object sender, System.EventArgs e)
@@ -26,7 +26,6 @@ namespace FMeta_Analysis
         {
             string pointer = ((char)(colNam + 64)).ToString() + rowNum;
             Excel.Range rng = this.Application.Range[pointer];
-
             rng.Value2 = val;
         }
 
@@ -84,9 +83,29 @@ namespace FMeta_Analysis
         public string getCell(int colNam, int rowNum)
         {
             string pointer = ((char)(colNam + 64)).ToString() + rowNum;
-            Excel.Range rng = this.Application.Range[pointer];
+            Excel.Range rng = Application.Range[pointer];
 
             return rng.Value2.ToString();
+        }
+
+        public void clearRow(int rowNum)
+        {
+            Excel.Range rng = Application.Rows[rowNum, missing];
+            rng.Select();
+            rng.Delete(Excel.XlDirection.xlUp);
+            rng = Application.Cells[1,1];
+            rng.Select();
+        }
+
+        public void clearCol(int colNum)
+        {
+            Excel.Range rng = Application.Columns[colNum];
+            
+            rng.Select();
+            rng.Delete(Excel.XlDirection.xlToLeft);
+
+            rng = Application.Cells[1,1];
+            rng.Select();
         }
 
         #region Код, автоматически созданный VSTO

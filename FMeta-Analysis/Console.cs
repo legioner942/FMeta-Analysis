@@ -41,6 +41,14 @@ namespace FMeta_Analysis
                     logTextBox.Text += item;
                 }
             }
+            else if (inp=="test4")
+            {
+                Globals.ThisAddIn.clearRow(1);
+            }
+            else if (inp == "test6")
+            {
+                Globals.ThisAddIn.clearCol(3);
+            }
             else
             {
                 logTextBox.Text += inp + " result: ";
@@ -55,6 +63,14 @@ namespace FMeta_Analysis
                     logTextBox.Text += ex.Message + "\r\n";
                 }
             }
+        }
+
+        public void setStatus(bool flag)
+        {
+            string status = "";
+            status = flag ? "Init" : "No init";
+            toolStripStatusLabel1.Text = status;
+            toolStripStatusLabel1.ForeColor = flag ? Color.Green : Color.Red;
         }
     }
 }

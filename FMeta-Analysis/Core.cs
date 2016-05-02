@@ -8,51 +8,136 @@ namespace FMeta_Analysis
 {
     class Core
     {
+
+        /// <summary>
+        /// Нафиг это дерьмецо с хранением индексов и прочего. 
+        /// Неа, не нафиг. Алиасы как хранить?
+        /// 
+        /// TODO: Сохранение параметров
+        /// TODO: Парс числа параметров для add 
+        /// TODO: Проверка уникальности header при init
+        /// 
+        /// </summary>
+        
         class Column
         {
             public string Name { get; set; }
             public string Nick { get; set; }
-            public short colNumber { get; set; }
+            public int colNumber { get; set; }
         }
 
         enum command
         {
             init,
             add,
+            row,
+            column,
+            rollback,
             no
         }
 
         List<Column> listOfCol;
+        List<string> paramLine;
+        List<string> buffer;
         command current, subcommand;
-        string param;
         bool Init;
         
         public Core()
         {
             listOfCol = new List<Column>();
-            current = command.no;
+            paramLine = new List<string>();
+            buffer = new List<string>();
+
+            current = subcommand = command.no;
             Init = false;
-            param = "";
+            
         }
         
         private void add()
         {
-            
+            //Add - добавление в указанную позицию с указанием имени/ника и значения
+            //Add row добавление перечисленных значений в точной последовательности (вставка строки)
+            //Add col добавление столбца в указанную позицию
+            //Все действия будут стирать предыдущие значения
+
+            if (subcommand == command.row)
+            {
+                string[] par = new string[paramLine.Count - 1];
+                paramLine.CopyTo(1, par, 0, paramLine.Count - 1);
+                Globals.ThisAddIn.clearRow(int.Parse(paramLine[0]));
+                Globals.ThisAddIn.setRow(par, int.Parse(paramLine[0]));
+            }
+            else if (subcommand == command.no)
+            {
+                for (int i = 1; i < paramLine.Count; i+=2)
+                {
+                    Column bf = listOfCol.Find(
+                      delegate (Column inp)
+                      {
+                          return inp.Name == paramLine[i] || inp.Nick == paramLine[i];
+                      }
+                    );
+                    if (bf == null) throw new Exception("Неверное имя/сокращение столбца!"); // не очень здорово, ибо остальные значения не добавятся
+                    Globals.ThisAddIn.setCell(paramLine[i+1], bf.colNumber, int.Parse(paramLine[0]));
+                }
+            }
+            else if (subcommand == command.column)
+            {
+                Globals.ThisAddIn.clearCol(int.Parse(paramLine[0]));
+                
+            }
+            else
+            {
+                // Тут должно быть исключение
+            }
         }
 
         private void init()
         {
-            
+            List<string> buf = new List<string>();
+            int index = 1, arg = 0;
+            if (Init) listOfCol.Clear();
+            if (subcommand == command.no)
+            {
+                try
+                {
+                    arg = int.Parse(paramLine[0]);
+                    buf = Globals.ThisAddIn.getRow(1, arg);
+                    foreach (var item in buf)
+                    {
+                        listOfCol.Add(new Column() { colNumber = index, Name = item, Nick = "" });
+                        index++;
+                    }
+                }
+                catch(Exception)
+                {
+                    // TODO: скорее всего бросать исключение в "выше стояющую инстанцию"
+                }
+            } 
+            else if (subcommand == command.add)
+            {
+                string[] buf2 = paramLine.ToArray();
+                Globals.ThisAddIn.setRow(buf2, 1);
+                foreach (var item in buf2)
+                {
+                    listOfCol.Add(new Column() { colNumber = index, Name = item, Nick = "" });
+                    index++;
+                }
+            }
+            Init = true;
         }
 
         void Execute()
         {
-            string[] buf = param.Split(' ');
             switch(current)
             {
                 case command.add:
-                    if (buf.Length % 2 != 0) throw new Exception("Неверное число параметров!");
+
+                    if ((paramLine.Count-1) % 2 != 0 && 
+                        subcommand == command.no) throw new Exception("Неверное число параметров!");
+
                     if (!Init) throw new Exception("Инициализация не была произведена! Выполните ее набрав init,\nлибо кликнув на статус");
+
                     add();
                     break;
                 case command.init:
@@ -65,7 +150,8 @@ namespace FMeta_Analysis
         public void Compiler(string commandline)
         {
             string[] buf = commandline.Split(' ');
-            param = "";
+            int command_res = 0;
+            paramLine.Clear();            
             
             switch (buf[0])
             {
@@ -77,32 +163,23 @@ namespace FMeta_Analysis
                     break;
                 default: throw new Exception("Неверная команда!");
             }
-            buf.CopyTo(buf, 1);
+            command_res++;
 
-            if (buf.Length > 1)
+            if (buf.Length > 1) // Косяк может выползти. Нужно придумать, как это лучше обработать
             {
                 switch (buf[1])
                 {
                     case "add": subcommand = command.add; break;
-                    default: subcommand = command.no; break;
+                    case "row": subcommand = command.row; break;
+                    case "col": subcommand = command.column; break;
+                    default: subcommand = command.no; command_res--; break; //сделал тут
                 }
-                buf.CopyTo(buf, 1);
+                command_res++;
             }
-            
-            for (int i = 0; i < buf.Length; i++)
+
+            for (int i = command_res; i < buf.Length; i++)
             {
-                if (i % 2 == 1)
-                {
-                    Column bf = listOfCol.Find(
-                      delegate (Column inp)
-                      {
-                          return inp.Name == buf[i] || inp.Nick == buf[i];
-                      }
-                    );
-                    if (bf != null) throw new Exception("Неверная имя/сокращение столбца!");
-                    param += bf.colNumber.ToString()+" ";
-                }
-                else param += buf[i] + " ";
+                paramLine.Add(buf[i]);
             }
 
             Execute();
