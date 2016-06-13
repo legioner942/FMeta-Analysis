@@ -15,8 +15,15 @@ namespace FMeta_Analysis
 
         private void CallConsole_Click(object sender, RibbonControlEventArgs e)
         {
-            Console f = new Console();
-            f.Show();
+            try
+            {
+                Globals.ThisAddIn.console.Show();
+            }
+            catch(ObjectDisposedException)
+            {
+                Globals.ThisAddIn.console = new Console();
+                Globals.ThisAddIn.console.Show();
+            }
         }
     }
 }

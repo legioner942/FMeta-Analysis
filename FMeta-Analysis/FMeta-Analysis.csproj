@@ -109,8 +109,11 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -162,6 +165,13 @@
       <DependentUpon>Console.cs</DependentUpon>
     </Compile>
     <Compile Include="Core.cs" />
+    <Compile Include="FormState.cs" />
+    <Compile Include="FormState.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>FormState.settings</DependentUpon>
+    </Compile>
+    <Compile Include="MessageShower.cs" />
     <Compile Include="MetaRibbon.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -173,6 +183,7 @@
     </Compile>
     <EmbeddedResource Include="Console.resx">
       <DependentUpon>Console.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="MetaRibbon.resx">
       <DependentUpon>MetaRibbon.cs</DependentUpon>
@@ -186,10 +197,17 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Reductions.resx">
+      <DependentUpon>Reductions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Settings.resx">
+      <DependentUpon>Settings.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="app.config" />
     <None Include="FMeta-Analysis_TemporaryKey.pfx" />
-    <None Include="Meta-settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
+    <None Include="FormState.settings">
+      <Generator>PublicSettingsSingleFileGenerator</Generator>
+      <LastGenOutput>FormState.Designer.cs</LastGenOutput>
     </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -198,6 +216,22 @@
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Reductions.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reductions.Designer.cs">
+      <DependentUpon>Reductions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RichTextBoxNoFocus.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="RProcess.cs" />
+    <Compile Include="Settings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Settings.Designer.cs">
+      <DependentUpon>Settings.cs</DependentUpon>
     </Compile>
     <Compile Include="ThisAddIn.cs">
       <SubType>Code</SubType>
